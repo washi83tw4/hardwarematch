@@ -52,22 +52,19 @@ export default function Home() {
     setLinkPcPronto("");
   };
 
-  // NOVA FUNÇÃO COM LIMITE INTELIGENTE (KITS VS PENTE ÚNICO)
   const alterarQuantidade = (catId, delta) => {
     setBuild(prev => {
       const pecaAtual = prev[catId];
       if (!pecaAtual) return prev;
       
-      let limiteMaximo = 4; // Limite padrão para HD, SSD e pentes soltos
+      let limiteMaximo = 4;
 
-      // Se for RAM e o nome indicar que já é um kit de 2 pentes (ex: 2x8GB, 2x16GB)
       if (catId === 'ram' && pecaAtual.nome.toLowerCase().includes('2x')) {
-          limiteMaximo = 2; // O limite cai para 2 kits (totalizando 4 pentes na placa-mãe)
+          limiteMaximo = 2; 
       }
       
       const novaQtd = pecaAtual.qtd + delta;
       
-      // Impede de baixar de 1 e de passar do limite inteligente
       if (novaQtd < 1 || novaQtd > limiteMaximo) return prev; 
       
       return { ...prev, [catId]: { ...pecaAtual, qtd: novaQtd } };
@@ -96,7 +93,7 @@ export default function Home() {
       novoBuild['gabinete'] = selecionarPecaDireta('gb_a1', 'gabinete', bancoProdutos);
       novoBuild['fonte'] = selecionarPecaDireta('f3', 'fonte', bancoProdutos);
       novoBuild['gpu'] = null;
-      if(novoBuild['ram']) novoBuild['ram'].qtd = 2; // Coloca 2 memórias direto no PC pronto
+      if(novoBuild['ram']) novoBuild['ram'].qtd = 2; 
       setLinkPcPronto("https://s.shopee.com.br/gMPVeJjGb");
     } else if (tipo === 2) { 
       novoBuild['cpu'] = selecionarPecaDireta('c4', 'cpu', bancoProdutos);
@@ -249,11 +246,11 @@ export default function Home() {
         <div className="layout-duplo">
           <section className="secao-principal">
             
-            <div className="pcs-prontos" style={{ display: 'flex', gap: '10px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '10px' }}>
-              <button onClick={() => carregarSetupPronto(1)} style={{ flex: 1, padding: '10px', background: '#334155', border: '1px solid #4ade80', color: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>🥉 Baratinho</button>
-              <button onClick={() => carregarSetupPronto(2)} style={{ flex: 1, padding: '10px', background: '#334155', border: '1px solid #3b82f6', color: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>🥈 Custo-Benefício</button>
-              <button onClick={() => carregarSetupPronto(3)} style={{ flex: 1, padding: '10px', background: '#334155', border: '1px solid #f59e0b', color: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>🥇 PC da NASA</button>
-              <button onClick={limparTudo} style={{ padding: '10px', background: '#ef4444', border: 'none', color: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>🗑️ Limpar</button>
+            <div className="pcs-prontos">
+              <button className="btn-pronto btn-bronze" onClick={() => carregarSetupPronto(1)}>🥉 Baratinho</button>
+              <button className="btn-pronto btn-prata" onClick={() => carregarSetupPronto(2)}>🥈 Custo-Benefício</button>
+              <button className="btn-pronto btn-ouro" onClick={() => carregarSetupPronto(3)}>🥇 PC da NASA</button>
+              <button className="btn-pronto btn-limpar" onClick={limparTudo}>🗑️ Limpar</button>
             </div>
 
             <div className="lista-montagem">
@@ -283,7 +280,6 @@ export default function Home() {
                               {item.qtd > 1 ? `${item.qtd}x ` : ''}{item.nome} {item.poder_igpu > 0 && <span style={{fontSize:'0.7rem', background:'#3b82f6', color:'white', padding:'2px 5px', borderRadius:'4px', marginLeft:'5px'}}>APU</span>}
                             </button>
 
-                            {/* SE FOR MEMÓRIA OU ARMAZENAMENTO, MOSTRA OS BOTÕES DE QUANTIDADE */}
                             {(cat.id === 'ram' || cat.id === 'armazenamento') && (
                               <div className="controle-qtd">
                                 <button onClick={() => alterarQuantidade(cat.id, -1)}>-</button>
