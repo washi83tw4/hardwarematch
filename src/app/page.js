@@ -52,6 +52,28 @@ export default function Home() {
     setLinkPcPronto("");
   };
 
+  // NOVA FUNÇÃO COM LIMITE INTELIGENTE (KITS VS PENTE ÚNICO)
+  const alterarQuantidade = (catId, delta) => {
+    setBuild(prev => {
+      const pecaAtual = prev[catId];
+      if (!pecaAtual) return prev;
+      
+      let limiteMaximo = 4; // Limite padrão para HD, SSD e pentes soltos
+
+      // Se for RAM e o nome indicar que já é um kit de 2 pentes (ex: 2x8GB, 2x16GB)
+      if (catId === 'ram' && pecaAtual.nome.toLowerCase().includes('2x')) {
+          limiteMaximo = 2; // O limite cai para 2 kits (totalizando 4 pentes na placa-mãe)
+      }
+      
+      const novaQtd = pecaAtual.qtd + delta;
+      
+      // Impede de baixar de 1 e de passar do limite inteligente
+      if (novaQtd < 1 || novaQtd > limiteMaximo) return prev; 
+      
+      return { ...prev, [catId]: { ...pecaAtual, qtd: novaQtd } };
+    });
+  };
+
   const limparTudo = () => {
     setBuild({ 'cpu': null, 'cooler': null, 'placa-mae': null, 'ram': null, 'gpu': null, 'armazenamento': null, 'gabinete': null, 'fonte': null });
     setLinkPcPronto("");
@@ -74,6 +96,7 @@ export default function Home() {
       novoBuild['gabinete'] = selecionarPecaDireta('gb_a1', 'gabinete', bancoProdutos);
       novoBuild['fonte'] = selecionarPecaDireta('f3', 'fonte', bancoProdutos);
       novoBuild['gpu'] = null;
+      if(novoBuild['ram']) novoBuild['ram'].qtd = 2; // Coloca 2 memórias direto no PC pronto
       setLinkPcPronto("https://s.shopee.com.br/gMPVeJjGb");
     } else if (tipo === 2) { 
       novoBuild['cpu'] = selecionarPecaDireta('c4', 'cpu', bancoProdutos);
@@ -84,6 +107,7 @@ export default function Home() {
       novoBuild['armazenamento'] = selecionarPecaDireta('a8', 'armazenamento', bancoProdutos);
       novoBuild['gabinete'] = selecionarPecaDireta('gb_m1', 'gabinete', bancoProdutos);
       novoBuild['fonte'] = selecionarPecaDireta('f3', 'fonte', bancoProdutos);
+      if(novoBuild['ram']) novoBuild['ram'].qtd = 2;
       setLinkPcPronto("https://s.shopee.com.br/1qYMtfWxKF");
     } else if (tipo === 3) { 
       novoBuild['cpu'] = selecionarPecaDireta('c19', 'cpu', bancoProdutos);
@@ -94,6 +118,7 @@ export default function Home() {
       novoBuild['armazenamento'] = selecionarPecaDireta('a1', 'armazenamento', bancoProdutos);
       novoBuild['gabinete'] = selecionarPecaDireta('gb_m3', 'gabinete', bancoProdutos);
       novoBuild['fonte'] = selecionarPecaDireta('f5', 'fonte', bancoProdutos);
+      if(novoBuild['ram']) novoBuild['ram'].qtd = 2;
       setLinkPcPronto("https://s.shopee.com.br/5AoortdqCm");
     }
 
@@ -108,7 +133,10 @@ export default function Home() {
     categorias.forEach(cat => {
         let item = build[cat.id];
         if (item) {
-            texto += `✅ *${cat.nome}:* ${item.nome} - R$ ${(item.preco).toFixed(2)}\n`;
+            let precoMultiplicado = item.preco * (item.qtd || 1);
+            let qtdTexto = item.qtd > 1 ? `${item.qtd}x ` : "";
+            texto += `✅ *${cat.nome}:* ${qtdTexto}${item.nome} - R$ ${precoMultiplicado.toFixed(2)}\n`;
+            
             let linkAcesso = (item.link && item.link !== 'https://shope.ee/SEU_LINK_AQUI') 
                              ? item.link 
                              : `https://shopee.com.br/search?keyword=${encodeURIComponent(item.nome)}`;
@@ -127,8 +155,9 @@ export default function Home() {
 
   Object.values(build).forEach(peca => {
     if (peca) {
-      precoTotal += peca.preco;
-      if (peca.consumo) consumoTotal += peca.consumo;
+      precoTotal += peca.preco * (peca.qtd || 1); 
+      if (peca.consumo) consumoTotal += peca.consumo * (peca.qtd || 1); 
+      
       if (peca.categoria === 'cpu') {
           cpuPoder = peca.poder_cpu || 0;
           igpuPoder = peca.poder_igpu || 0;
@@ -247,11 +276,22 @@ export default function Home() {
                       </div>
                       <div className="col-selecao">
                         <small style={{ color: 'var(--text-muted)', display:'block', marginBottom: '5px', textAlign: 'left' }}>{cat.nome}</small>
+                        
                         {item ? (
-                          <div style={{ display:'flex', gap:'10px', alignItems:'center' }}>
+                          <div style={{ display:'flex', gap:'10px', alignItems:'center', flexWrap: 'wrap' }}>
                             <button className="btn-trocar" onClick={() => abrirModal(cat.id)}>
-                              {item.nome} {item.poder_igpu > 0 && <span style={{fontSize:'0.7rem', background:'#3b82f6', color:'white', padding:'2px 5px', borderRadius:'4px', marginLeft:'5px'}}>APU</span>}
+                              {item.qtd > 1 ? `${item.qtd}x ` : ''}{item.nome} {item.poder_igpu > 0 && <span style={{fontSize:'0.7rem', background:'#3b82f6', color:'white', padding:'2px 5px', borderRadius:'4px', marginLeft:'5px'}}>APU</span>}
                             </button>
+
+                            {/* SE FOR MEMÓRIA OU ARMAZENAMENTO, MOSTRA OS BOTÕES DE QUANTIDADE */}
+                            {(cat.id === 'ram' || cat.id === 'armazenamento') && (
+                              <div className="controle-qtd">
+                                <button onClick={() => alterarQuantidade(cat.id, -1)}>-</button>
+                                <span>{item.qtd}</span>
+                                <button onClick={() => alterarQuantidade(cat.id, 1)}>+</button>
+                              </div>
+                            )}
+
                             <button className="btn-remover" onClick={() => removerPeca(cat.id)}>🗑️</button>
                           </div>
                         ) : (
@@ -259,10 +299,10 @@ export default function Home() {
                         )}
                       </div>
                       <div className="col-watts">
-                        {item ? (item.consumo > 0 ? item.consumo + ' W' : '--') : '--'}
+                        {item ? (item.consumo > 0 ? (item.consumo * item.qtd) + ' W' : '--') : '--'}
                       </div>
                       <div className="col-preco">
-                        {item ? 'R$ ' + item.preco.toFixed(2) : '--'}
+                        {item ? 'R$ ' + (item.preco * item.qtd).toFixed(2) : '--'}
                       </div>
                     </div>
                   );

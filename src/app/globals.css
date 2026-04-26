@@ -71,12 +71,9 @@ header p {
   gap: 40px;
   align-items: start;
 }
-
-/* A MÁGICA QUE IMPEDE O CARROSSEL DE EMPURRAR A TELA */
 .secao-principal {
   min-width: 0;
 }
-
 @media (max-width: 1000px) {
   .layout-duplo {
     grid-template-columns: 1fr;
@@ -168,6 +165,34 @@ header p {
   background: var(--danger);
   color: white;
 }
+
+/* === CONTROLE DE QUANTIDADE === */
+.controle-qtd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0f172a;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+.controle-qtd button {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+.controle-qtd button:hover {
+  color: white;
+}
+.controle-qtd span {
+  font-weight: bold;
+  min-width: 15px;
+  text-align: center;
+}
+
 .col-watts, .col-preco { font-weight: bold; }
 
 /* === PAINEL LATERAL (RESULTADOS) === */
