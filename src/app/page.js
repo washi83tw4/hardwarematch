@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"; 
 import { useState, useEffect } from "react";
 
@@ -12,6 +13,8 @@ export default function Home() {
   const [modalAberto, setModalAberto] = useState(false);
   const [categoriaAtual, setCategoriaAtual] = useState(null);
   const [linkPcPronto, setLinkPcPronto] = useState("");
+  
+  const [busca, setBusca] = useState("");
 
   const categorias = [
     { id: 'cpu', nome: 'Processador (CPU)' },
@@ -33,6 +36,7 @@ export default function Home() {
 
   const abrirModal = (catId) => {
     setCategoriaAtual(catId);
+    setBusca(""); 
     setModalAberto(true);
   };
 
@@ -58,13 +62,11 @@ export default function Home() {
       if (!pecaAtual) return prev;
       
       let limiteMaximo = 4;
-
       if (catId === 'ram' && pecaAtual.nome.toLowerCase().includes('2x')) {
           limiteMaximo = 2; 
       }
       
       const novaQtd = pecaAtual.qtd + delta;
-      
       if (novaQtd < 1 || novaQtd > limiteMaximo) return prev; 
       
       return { ...prev, [catId]: { ...pecaAtual, qtd: novaQtd } };
@@ -85,38 +87,42 @@ export default function Home() {
     let novoBuild = { ...build };
     
     if (tipo === 1) { 
-      novoBuild['cpu'] = selecionarPecaDireta('c15', 'cpu', bancoProdutos);
-      novoBuild['cooler'] = selecionarPecaDireta('cl1', 'cooler', bancoProdutos);
-      novoBuild['placa-mae'] = selecionarPecaDireta('m_amd2', 'placa-mae', bancoProdutos);
-      novoBuild['ram'] = selecionarPecaDireta('r5', 'ram', bancoProdutos);
-      novoBuild['armazenamento'] = selecionarPecaDireta('a8', 'armazenamento', bancoProdutos);
-      novoBuild['gabinete'] = selecionarPecaDireta('gb_a1', 'gabinete', bancoProdutos);
-      novoBuild['fonte'] = selecionarPecaDireta('f3', 'fonte', bancoProdutos);
-      novoBuild['gpu'] = null;
-      if(novoBuild['ram']) novoBuild['ram'].qtd = 2; 
-      setLinkPcPronto("https://s.shopee.com.br/gMPVeJjGb");
+      // 🥉 PC BARATINHO
+      novoBuild['cpu'] = selecionarPecaDireta('c106', 'cpu', bancoProdutos); // Ryzen 5 4600G
+      novoBuild['cooler'] = selecionarPecaDireta('cl1', 'cooler', bancoProdutos); // Cooler Box
+      novoBuild['placa-mae'] = selecionarPecaDireta('m_amd1', 'placa-mae', bancoProdutos); // A320M
+      novoBuild['ram'] = selecionarPecaDireta('r2', 'ram', bancoProdutos); // 8GB DDR4
+      if(novoBuild['ram']) novoBuild['ram'].qtd = 2; // 2x 8GB
+      novoBuild['gpu'] = null; // Usa APU
+      novoBuild['armazenamento'] = selecionarPecaDireta('a8', 'armazenamento', bancoProdutos); // 480GB SATA
+      novoBuild['gabinete'] = selecionarPecaDireta('gb1', 'gabinete', bancoProdutos); // Gabinete Básico
+      novoBuild['fonte'] = selecionarPecaDireta('f3', 'fonte', bancoProdutos); // 500W
+      setLinkPcPronto("https://s.shopee.com.br/gMPVeJjGb"); 
     } else if (tipo === 2) { 
-      novoBuild['cpu'] = selecionarPecaDireta('c4', 'cpu', bancoProdutos);
-      novoBuild['cooler'] = selecionarPecaDireta('cl1', 'cooler', bancoProdutos);
-      novoBuild['placa-mae'] = selecionarPecaDireta('m_intel1', 'placa-mae', bancoProdutos);
-      novoBuild['ram'] = selecionarPecaDireta('r6', 'ram', bancoProdutos);
-      novoBuild['gpu'] = selecionarPecaDireta('g11', 'gpu', bancoProdutos);
-      novoBuild['armazenamento'] = selecionarPecaDireta('a8', 'armazenamento', bancoProdutos);
-      novoBuild['gabinete'] = selecionarPecaDireta('gb_m1', 'gabinete', bancoProdutos);
-      novoBuild['fonte'] = selecionarPecaDireta('f3', 'fonte', bancoProdutos);
-      if(novoBuild['ram']) novoBuild['ram'].qtd = 2;
-      setLinkPcPronto("https://s.shopee.com.br/1qYMtfWxKF");
+      // 🥈 PC CUSTO-BENEFÍCIO
+      novoBuild['cpu'] = selecionarPecaDireta('c108', 'cpu', bancoProdutos); // Ryzen 5 5600
+      novoBuild['cooler'] = selecionarPecaDireta('cl6', 'cooler', bancoProdutos); // AG400
+      novoBuild['placa-mae'] = selecionarPecaDireta('m_amd3', 'placa-mae', bancoProdutos); // B550M
+      novoBuild['ram'] = selecionarPecaDireta('r3', 'ram', bancoProdutos); // 8GB RGB
+      if(novoBuild['ram']) novoBuild['ram'].qtd = 2; // 2x 8GB
+      novoBuild['gpu'] = selecionarPecaDireta('g_rtx4060', 'gpu', bancoProdutos); // RTX 4060
+      novoBuild['armazenamento'] = selecionarPecaDireta('a3', 'armazenamento', bancoProdutos); // 1TB NVMe
+      novoBuild['gabinete'] = selecionarPecaDireta('gb_m4', 'gabinete', bancoProdutos); // Montech Air 100
+      novoBuild['fonte'] = selecionarPecaDireta('f6', 'fonte', bancoProdutos); // 650W
+      setLinkPcPronto("https://s.shopee.com.br/1qYMtfWxKF"); 
     } else if (tipo === 3) { 
-      novoBuild['cpu'] = selecionarPecaDireta('c19', 'cpu', bancoProdutos);
-      novoBuild['cooler'] = selecionarPecaDireta('cl8', 'cooler', bancoProdutos);
-      novoBuild['placa-mae'] = selecionarPecaDireta('m_amd3', 'placa-mae', bancoProdutos);
-      novoBuild['ram'] = selecionarPecaDireta('r8', 'ram', bancoProdutos);
-      novoBuild['gpu'] = selecionarPecaDireta('g23', 'gpu', bancoProdutos);
-      novoBuild['armazenamento'] = selecionarPecaDireta('a1', 'armazenamento', bancoProdutos);
-      novoBuild['gabinete'] = selecionarPecaDireta('gb_m3', 'gabinete', bancoProdutos);
-      novoBuild['fonte'] = selecionarPecaDireta('f5', 'fonte', bancoProdutos);
-      if(novoBuild['ram']) novoBuild['ram'].qtd = 2;
-      setLinkPcPronto("https://s.shopee.com.br/5AoortdqCm");
+      // 🥇 PC DA NASA
+      novoBuild['cpu'] = selecionarPecaDireta('c122', 'cpu', bancoProdutos); // Ryzen 7 7800X3D
+      novoBuild['cooler'] = selecionarPecaDireta('cl13', 'cooler', bancoProdutos); // Corsair H150 360mm
+      novoBuild['placa-mae'] = selecionarPecaDireta('m_amd8', 'placa-mae', bancoProdutos); // X670E
+      novoBuild['ram'] = selecionarPecaDireta('r13', 'ram', bancoProdutos); // 32GB (2x16)
+      if(novoBuild['ram']) novoBuild['ram'].qtd = 1;
+      novoBuild['gpu'] = selecionarPecaDireta('g_rtx4090', 'gpu', bancoProdutos); // RTX 4090
+      novoBuild['armazenamento'] = selecionarPecaDireta('a6', 'armazenamento', bancoProdutos); // 1TB NVMe Rápido
+      if(novoBuild['armazenamento']) novoBuild['armazenamento'].qtd = 2; // 2x 1TB = 2TB
+      novoBuild['gabinete'] = selecionarPecaDireta('gb_m3', 'gabinete', bancoProdutos); // Montech King 95 Pro
+      novoBuild['fonte'] = selecionarPecaDireta('f11', 'fonte', bancoProdutos); // 1000W
+      setLinkPcPronto("https://s.shopee.com.br/5AoortdqCm"); 
     }
 
     setBuild(novoBuild);
@@ -124,7 +130,7 @@ export default function Home() {
 
   const compartilharWhatsApp = () => {
     let qtdPecas = Object.values(build).filter(p => p !== null).length;
-    if (qtdPecas === 0) return alert("Adicione pelo menos uma peça antes de compartilhar!");
+    if (qtdPecas === 0) return alert("Adicione pelo menos uma peça antes de partilhar!");
 
     let texto = "🚀 *Olha o PC que montei no HardwareMatch Pro!*\n\n";
     categorias.forEach(cat => {
@@ -134,13 +140,13 @@ export default function Home() {
             let qtdTexto = item.qtd > 1 ? `${item.qtd}x ` : "";
             texto += `✅ *${cat.nome}:* ${qtdTexto}${item.nome} - R$ ${precoMultiplicado.toFixed(2)}\n`;
             
-            let linkAcesso = (item.link && item.link !== 'https://shope.ee/SEU_LINK_AQUI') 
+            let linkAcesso = (item.link && item.link !== 'https://shope.ee/SEU_LINK_AQUI' && item.link.trim() !== '') 
                              ? item.link 
                              : `https://shopee.com.br/search?keyword=${encodeURIComponent(item.nome)}`;
-            texto += `🛒 Compre aqui: ${linkAcesso}\n\n`;
+            texto += `🛒 Compra aqui: ${linkAcesso}\n\n`;
         }
     });
-    texto += `💰 *Valor Total: R$ ${precoTotal.toFixed(2)}*\n\nQuer montar o seu PC sem gargalo? Acesse o HardwareMatch Pro!`;
+    texto += `💰 *Valor Total: R$ ${precoTotal.toFixed(2)}*\n\nQueres montar o teu PC sem gargalo? Acede ao HardwareMatch Pro!`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
   };
 
@@ -169,7 +175,7 @@ export default function Home() {
 
   let gargaloPercentual = 0;
   let penalidadeFps = 1; 
-  let textoGargalo = "Adicione CPU e GPU para analisar.";
+  let textoGargalo = "Adiciona CPU e GPU para analisar.";
   let corBarra = "#334155"; 
   let usandoGraficoIntegrado = false;
 
@@ -181,28 +187,28 @@ export default function Home() {
   if (cpuPoder > 0 && gpuPoder > 0) {
       if (usandoGraficoIntegrado) {
           gargaloPercentual = 0;
-          textoGargalo = `🎮 Rodando com Vídeo Integrado (APU). O desempenho em jogos será básico.`;
+          textoGargalo = `🎮 A correr com Vídeo Integrado (APU). O desempenho em jogos será básico.`;
           corBarra = "#3b82f6"; 
           penalidadeFps = 0.8; 
       } else if (gpuPoder > cpuPoder * 1.6) {
           let diff = (gpuPoder - (cpuPoder * 1.6)) / gpuPoder;
           gargaloPercentual = Math.min(Math.round(diff * 100), 95); 
-          textoGargalo = `Gargalo de CPU! A sua Placa de Vídeo está sendo limitada pelo processador.`;
+          textoGargalo = `Gargalo de CPU! A tua Placa de Vídeo está a ser limitada pelo processador.`;
           corBarra = "#ef4444"; 
           penalidadeFps = 1 - (gargaloPercentual / 100); 
       } else if (cpuPoder > gpuPoder * 2.0) {
           let diff = (cpuPoder - (gpuPoder * 2.0)) / cpuPoder;
           gargaloPercentual = Math.min(Math.round(diff * 100), 80);
-          textoGargalo = `Gargalo de GPU! Seu Processador é forte demais para ela.`;
+          textoGargalo = `Gargalo de GPU! O teu Processador é demasiado forte para ela.`;
           corBarra = "#f59e0b"; 
           penalidadeFps = 1 - (gargaloPercentual / 150); 
       } else {
           gargaloPercentual = 2;
-          textoGargalo = `Sistema Equilibrado! Extraindo 100% das peças.`;
+          textoGargalo = `Sistema Equilibrado! A extrair 100% das peças.`;
           corBarra = "#4ade80"; 
       }
   } else if (cpuPoder > 0 && !temVideoDedicado && igpuPoder === 0) {
-      textoGargalo = `⚠️ ATENÇÃO: O Processador escolhido NÃO tem vídeo! Adicione uma Placa de Vídeo.`;
+      textoGargalo = `⚠️ ATENÇÃO: O Processador escolhido NÃO tem vídeo! Adiciona uma Placa de Vídeo.`;
       corBarra = "#ef4444";
       gargaloPercentual = 100;
   }
@@ -230,7 +236,26 @@ export default function Home() {
   if (build.fonte && build.fonte.potencia < consumoTotal * 1.2) avisoFonte = true;
 
   const produtosComLinkReal = bancoProdutos.filter(p => p.link && p.link !== 'https://shope.ee/SEU_LINK_AQUI' && p.link.trim() !== '');
-  const produtosFiltrados = bancoProdutos.filter(p => p.categoria === categoriaAtual);
+  
+  const produtosFiltrados = bancoProdutos.filter(p => {
+    if (!p) return false; 
+    
+    if (p.categoria !== categoriaAtual) return false;
+    if (busca && !p.nome.toLowerCase().includes(busca.toLowerCase())) return false;
+
+    if (categoriaAtual === 'cpu' && build['placa-mae']?.socket) {
+        if (p.socket && p.socket !== build['placa-mae'].socket) return false;
+    }
+    if (categoriaAtual === 'placa-mae') {
+        if (build['cpu']?.socket && p.socket && p.socket !== build['cpu'].socket) return false;
+        if (build['ram']?.tipo_ram && p.tipo_ram && p.tipo_ram !== build['ram'].tipo_ram) return false;
+    }
+    if (categoriaAtual === 'ram' && build['placa-mae']?.tipo_ram) {
+        if (p.tipo_ram && p.tipo_ram !== build['placa-mae'].tipo_ram) return false;
+    }
+
+    return true;
+  });
 
   return (
     <>
@@ -352,7 +377,7 @@ export default function Home() {
                 </div>
               </div>
               <button onClick={compartilharWhatsApp} style={{ width: '100%', marginTop: '15px', padding: '12px', background: '#25D366', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer' }}>
-                📲 Compartilhar Setup no WhatsApp
+                📲 Partilhar Setup no WhatsApp
               </button>
               
               {linkPcPronto && (
@@ -374,11 +399,11 @@ export default function Home() {
             <div className="card-resultado" style={{ borderColor: avisoFonte ? '#ef4444' : (qtdPecas > 0 ? '#4ade80' : 'var(--border)') }}>
               <h3>⚠️ Status de Montagem</h3>
               {avisoFonte ? (
-                <p>🔥 <strong>PERIGO:</strong> Sua Fonte não aguenta o sistema! Recomendado: {Math.ceil(consumoTotal * 1.2)}W.</p>
+                <p>🔥 <strong>PERIGO:</strong> A tua Fonte não aguenta o sistema! Recomendado: {Math.ceil(consumoTotal * 1.2)}W.</p>
               ) : qtdPecas > 0 ? (
                 <p>✅ <strong>Perfeito:</strong> Peças compatíveis.</p>
               ) : (
-                <p>Selecione as peças para iniciar a validação.</p>
+                <p>Seleciona as peças para iniciar a validação.</p>
               )}
             </div>
 
@@ -386,7 +411,7 @@ export default function Home() {
               <h3>🎮 Projeção de FPS (1080p Alto)</h3>
               <div className="fps-grid" id="container-fps">
                   {fpsJogos.length === 0 ? (
-                      <p className="aviso-vazio">Adicione CPU com Vídeo Integrado ou Placa Dedicada para simular.</p>
+                      <p className="aviso-vazio">Adiciona CPU com Vídeo Integrado ou Placa Dedicada para simular.</p>
                   ) : (
                       fpsJogos.map((jogo, i) => (
                           <div key={i} className="fps-item">
@@ -411,14 +436,24 @@ export default function Home() {
       {modalAberto && (
         <div className="modal">
           <div className="modal-conteudo">
-            <div className="modal-header">
-              <h2>Escolha a Peça</h2>
-              <button onClick={fecharModal}>Fechar [X]</button>
+            <div className="modal-header" style={{flexDirection: 'column', alignItems: 'stretch', gap: '15px'}}>
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <h2>Escolhe a Peça</h2>
+                <button onClick={fecharModal}>Fechar [X]</button>
+              </div>
+              
+              <input 
+                type="text" 
+                placeholder="🔍 Pesquisar peça pelo nome..." 
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                style={{ width: '100%', padding: '10px 15px', borderRadius: '8px', border: '1px solid var(--border)', background: '#0f172a', color: 'white', outline: 'none' }}
+              />
             </div>
             
             <div className="grid-produtos-modal">
               {produtosFiltrados.length === 0 ? (
-                <p className="texto-vermelho">Nenhuma peça compatível.</p>
+                <p className="texto-vermelho">Nenhuma peça encontrada ou compatível com o teu setup atual.</p>
               ) : (
                 produtosFiltrados.map(p => (
                   <div key={p.id} className="card-modal">
@@ -427,7 +462,11 @@ export default function Home() {
                       <h4>
                         {p.nome} {p.poder_igpu > 0 && <span style={{fontSize:'0.7rem', background:'#3b82f6', color:'white', padding:'2px 5px', borderRadius:'4px', marginLeft:'5px', verticalAlign: 'middle'}}>Vídeo Integrado</span>}
                       </h4>
-                      {p.consumo > 0 && <span className="badge-tech" style={{background:'#0f172a'}}>{p.consumo}W</span>}
+                      <div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', marginTop: '5px'}}>
+                        {p.consumo > 0 && <span className="badge-tech" style={{background:'#0f172a'}}>{p.consumo}W</span>}
+                        {p.socket && <span className="badge-tech" style={{background:'#1e293b', borderColor: '#8b5cf6', color: '#c4b5fd'}}>{p.socket}</span>}
+                        {p.tipo_ram && <span className="badge-tech" style={{background:'#1e293b', borderColor: '#f59e0b', color: '#fcd34d'}}>{p.tipo_ram}</span>}
+                      </div>
                     </div>
                     <div className="modal-acao">
                       <p className="texto-verde">R$ {p.preco.toFixed(2)}</p>
